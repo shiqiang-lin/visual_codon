@@ -1,0 +1,5 @@
+amino_acid_No	amino_acid	original_codon	original_rank	original_GC%	optimized_codon	optimized_rank	optimized_GC%
+4	A	GCG	'1/4	76.19	GCA	'3/4	57.14
+5	T	ACG	'2/4	80.95	ACT	'3/4	61.9
+6	T	ACG	'2/4	85.71	ACT	'3/4	66.67
+7	R	CGG	'3/6	71.43	CGT	'1/6	52.38
