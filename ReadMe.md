@@ -213,7 +213,7 @@ At the bottom of the interface is the GC content plot, the abscissa is codon No.
 
 
 At the bottom left of the graph is the navigation toolbar of the graph, through which you can drag, zoom in, and save the graph. For more information on how to navigate the toolbar, please refer to the toolbar manual at
-https://matplotlib.org/stable/users/explain/figure/interactive.html#interactive-navigation。
+https://matplotlib.org/stable/users/explain/figure/interactive.html#interactive-navigation
 
 (3) Modify codons.
 Select the amino acid you want to modify by clicking on the GC content graph or by clicking on a row in the treeview. In the radiobutton in the middle of the interface, select the codon you want to change, and click Update codon to modify.
