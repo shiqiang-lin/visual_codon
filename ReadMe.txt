@@ -70,7 +70,7 @@ If pip does not automatically install them in your environment, you need to inst
 (3) Use git clone or Download ZIP to download program file 'visual_codon.py' and test sequence files to your local computer.
 
 
-GitHub address: https://github.com/****
+GitHub address: https://github.com/shiqiang-lin/visual_codon
 
 
 (4) Save the 'visual_codon.py' to a directory with read and write permissions. For example:
@@ -132,7 +132,7 @@ If pip does not automatically install them in your environment, you need to inst
 
 (3) Use git clone or Download ZIP to download program file 'visual_codon.py' and test sequence files to your local computer.
 
-GitHub address: https://github.com/****
+GitHub address: https://github.com/shiqiang-lin/visual_codon
 
 (4) Save the 'visual_codon.py' to a directory with read and write permissions. For example:
 Right-click on the desktop to create a new folder 'codons', copy the downloaded 'visual_codon.py' to 'codons', and you can use the mouse to drag or right-click to copy and paste.
