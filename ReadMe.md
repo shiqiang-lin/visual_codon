@@ -238,7 +238,7 @@ When you finish filling in the form and save it to a txt file, the program will 
 
 The judging conditions include: the amino acid must be a letter or * (stop codon), the fraction must be 0.xx or 1.00, and the sum of the fractions of each codon corresponding to the same amino acid is required to be in the range of [0.99, 1.01].
 
-Note: The visual_codon program directory provides example_of_customized_codon_table.txt files, and users can also modify this sample file directly.
+Note: The visual_codon program directory provides the 'example_of_customized_codon_table.txt', and users can also modify this sample file directly.
 
 After the modification is completed, open the visual codon program, click Open File on the host species selection screen... Select the host species file that you just modified.
 
