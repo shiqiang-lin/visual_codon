@@ -180,7 +180,7 @@ This program supports X11 forwarding to connect to remote Linux servers. Here we
 % python3.12 visual_codon.py
 ```
 
-After launching the program, the program will open the 宿主物种选择界面 interface, and here are the instructions for using it.
+After launching the program, the program will open the Select a host organism interface, and here are the instructions for using it.
 
 #### <font color=red> in macOS/Linux/Windows </font>
 
