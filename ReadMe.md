@@ -1,4 +1,4 @@
-### Visual codon: A user-friendly Python program for checking and optimizing gene GC content
+### Visual codon: A user-friendly Python program for viewing and optimizing gene GC content
 
 This program is used to display, modify, and compare the codons of gene. It shows the codons and GC content of the gene in the form of visual graphics, and the user can modify the codons to optimize GC content.
 
