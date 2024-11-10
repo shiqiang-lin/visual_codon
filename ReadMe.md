@@ -76,7 +76,8 @@ GitHub address: https://github.com/shiqiang-lin/visual_codon
 Copy the downloaded 'visual_codon.py' to the 'codons' directory. This can be done by dragging or right-clicking with the mouse.
 
 #### <font color=red> in Windows </font>
-(1) make sure you have installed Python 3.12.
+(1) make sure you have installed Python 3.12. 
+Note: The author's environment is Python 3.12, other versions of Python may also be able to run this program.
 
 ```zsh
 > python3.12
