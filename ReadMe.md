@@ -12,7 +12,7 @@ This program can be run on macOS/Linux/Windows and the results are the same. Ple
 ### I. Installation
 #### <font color=red> in macOS/Linux </font>
 (1) make sure you have installed Python 3.12.
-Note: The author's environment is Python 3.12, other versions of Python may also be able to run this program.
+Note: The author's environment is Python 3.12, other versions of Python and matplotlib may also be able to run this program.
 
 ```zsh
 % python3.12
@@ -77,7 +77,7 @@ Copy the downloaded 'visual_codon.py' to the 'codons' directory. This can be don
 
 #### <font color=red> in Windows </font>
 (1) make sure you have installed Python 3.12. 
-Note: The author's environment is Python 3.12, other versions of Python may also be able to run this program.
+Note: The author's environment is Python 3.12, other versions of Python and matplotlib may also be able to run this program.
 
 ```zsh
 > python3.12
