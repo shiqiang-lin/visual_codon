@@ -15,11 +15,12 @@ import os
 from operator import itemgetter
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, scrolledtext
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 import re
+import subprocess
 
 class InitialDialog(tk.Toplevel):
     def __init__(self, master):
@@ -158,6 +159,8 @@ class App(tk.Tk):
         self.label_blank_4 = None
         self.radiobutton = None
 
+        self.check_filepath = ''
+
         # sort the codon frequencies for each amino acid
         for key in self.amino_acid_to_codons_with_frequency_dictionary.keys():
             self.amino_acid_to_codons_with_frequency_dictionary[key] = \
@@ -204,6 +207,7 @@ class App(tk.Tk):
         edit_menu = tk.Menu(menu_bar, tearoff=0)
         edit_menu.add_command(label="Adjust graph font", command=self.set_graph_X_axis)
         edit_menu.add_command(label="Customize organism", command=self.customize_organism)
+        edit_menu.add_command(label="Check sequence", command=self.check_sequence)
         menu_bar.add_cascade(label="Edit", menu=edit_menu)
 
         # create frame1
@@ -930,6 +934,296 @@ class App(tk.Tk):
             ok_button = tk.Button(set_graph_X_axis, text="OK", command=lambda: self.set_X_axis_func(set_graph_X_axis, font_size_entry, font_spacing_entry))
             ok_button.pack(side="top", pady=5)
 
+
+    def check_sequence(self):
+        # Create a new toplevel window
+        check_window = tk.Toplevel(self)
+        check_window.title("Check Sequence")
+
+        # width = check_window.winfo_screenwidth()
+        # height = check_window.winfo_screenheight()
+        # print(f"width={width}, height={height}")
+        # check_window.geometry(f"{width}x{height}+0+0")
+
+        # Layout management
+        frame = tk.Frame(check_window)
+        frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        # frame.grid(row=0, column=0, sticky="wn", padx=5, pady=5)
+
+        # Left side (Label and Buttons)
+        left_frame = tk.Frame(frame)
+        left_frame.pack(side=tk.LEFT, fill=tk.Y, expand=False)
+        # left_frame.grid(row=0, column=0, sticky="wn", padx=5, pady=5)
+
+        label = tk.Label(left_frame, text="Open a sequence:")
+
+        label.grid(row=0, column=0, padx=1, pady=5, sticky=tk.W)
+        def open_seq_file():
+            file_path = filedialog.askopenfilename()
+            if file_path:
+                # self.file_path.set(file_path)
+                self.check_filepath = file_path
+                new_filepath = '\n'.join([file_path[i:i + 60] for i in range(0, len(file_path), 60)])
+                label2.config(text=new_filepath)
+
+        open_button = tk.Button(left_frame, text="Open File...", command=open_seq_file)
+        open_button.grid(row=1, column=0, sticky="w", padx=1, pady=5)
+
+        def restore_default():
+            entrymaxrepeat.config(textvariable=tk.StringVar(value="600"))
+            entrythreshold.config(textvariable=tk.StringVar(value="20"))
+            entrymaxrepeat1.config(textvariable=tk.StringVar(value="10"))
+            entryminrepeat1.config(textvariable=tk.StringVar(value="10"))
+            entryminpallen.config(textvariable=tk.StringVar(value="10"))
+            entrymaxpallen.config(textvariable=tk.StringVar(value="100"))
+            entrygaplimit.config(textvariable=tk.StringVar(value="100"))
+            entrynummismatches.config(textvariable=tk.StringVar(value="0"))
+            entrygap.config(textvariable=tk.StringVar(value="12"))
+            entrythreshold2.config(textvariable=tk.StringVar(value="50"))
+            entrymatch.config(textvariable=tk.StringVar(value="3"))
+            entrymismatch.config(textvariable=tk.StringVar(value="-4"))
+            entrysitelen.config(textvariable=tk.StringVar(value="4"))
+            entryenzymes.config(textvariable=tk.StringVar(value="BamHI,HindIII"))
+
+        restore_button = tk.Button(left_frame, text="Restore default", command=restore_default)
+        restore_button.grid(row=1, column=1, columnspan=2, sticky="we", padx=1, pady=5)
+
+        def clear_scrolledtext():
+            text_area.delete('1.0', tk.END)
+
+        clear_button = tk.Button(left_frame, text="Clear output", command=clear_scrolledtext)
+        clear_button.grid(row=1, column=3, columnspan=2, sticky="e", padx=1, pady=5)
+
+        label2 = tk.Label(left_frame, text="", justify='left', anchor='w', foreground='red')
+
+        label2.grid(row=2, column=0, columnspan=7, sticky="w", padx=1, pady=5)
+
+        def call_equicktandem(input_file, output_file, maxrepeat=600, threshold=20):
+            if input_file == '':
+                return
+            commandline = ["equicktandem", "-sequence", input_file, "-outfile", output_file,
+                       "-maxrepeat", str(maxrepeat), "-threshold", str(threshold)]
+            print(commandline)
+            try:
+                # subprocess.check_call(commandline)
+                output = subprocess.check_output(commandline)
+                file_content_lines = []
+                with open("outfile.txt", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        file_content_lines.append(line)
+                file_content = ''.join(file_content_lines)
+                text_area.insert(tk.END, output.decode("utf-8") + "\n")
+                text_area.insert(tk.END, "outfile.txt:" + "\n")
+                text_area.insert(tk.END, file_content + "\n")
+            except subprocess.CalledProcessError as e:
+                print("Error occurred:", e)
+                tk.messagebox.showerror("Error",
+                                        f" {e}")
+
+
+        # print(self.check_filepath)
+        equicktandem_button = tk.Button(left_frame, text="equicktandem", command=lambda :call_equicktandem(self.check_filepath,"outfile.txt", entrymaxrepeat.get(), entrythreshold.get()))
+        equicktandem_button.grid(row=3, column=0, padx=1, pady=5, sticky=tk.W)
+
+        labelmaxrepeat = tk.Label(left_frame, text="maxrepeat:" )
+        labelmaxrepeat.grid(row=3, column=1, padx=1, pady=5, sticky=tk.W)
+        entrymaxrepeat = tk.Entry(left_frame, textvariable=tk.StringVar(value="600"), width=5)
+        entrymaxrepeat.grid(row=3, column=2, padx=1, pady=5, sticky=tk.W)
+
+        labelthreshold = tk.Label(left_frame, text="threshold:")
+        labelthreshold.grid(row=3, column=3, padx=1, pady=5, sticky=tk.W)
+        entrythreshold = tk.Entry(left_frame, textvariable=tk.StringVar(value="20"), width=5)
+        entrythreshold.grid(row=3, column=4, padx=1, pady=5, sticky=tk.W)
+
+        def call_etandem(input_file, output_file, maxrepeat=10, minrepeat=10):
+            if input_file == '':
+                return
+            commandline = ["etandem", "-sequence", input_file, "-outfile", output_file,
+                       "-maxrepeat", str(maxrepeat), "-minrepeat", str(minrepeat)]
+            print(commandline)
+            try:
+                # subprocess.check_call(commandline)
+                output = subprocess.check_output(commandline)
+                file_content_lines = []
+                with open("outfile.txt", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        file_content_lines.append(line)
+                file_content = ''.join(file_content_lines)
+                text_area.insert(tk.END, output.decode("utf-8") + "\n")
+                text_area.insert(tk.END, "outfile.txt:" + "\n")
+                text_area.insert(tk.END, file_content + "\n")
+            except subprocess.CalledProcessError as e:
+                print("Error occurred:", e)
+                tk.messagebox.showerror("Error",
+                                        f" {e}")
+
+        etandem_button = tk.Button(left_frame, text="etandem", command=lambda :call_etandem(self.check_filepath,"outfile.txt", entrymaxrepeat1.get(), entryminrepeat1.get()))
+        etandem_button.grid(row=4, column=0, padx=1, pady=5, sticky=tk.W)
+
+        labelmaxrepeat1 = tk.Label(left_frame, text="maxrepeat:")
+        labelmaxrepeat1.grid(row=4, column=1, padx=1, pady=5, sticky=tk.W)
+        entrymaxrepeat1 = tk.Entry(left_frame, textvariable=tk.StringVar(value="10"), width=5)
+        entrymaxrepeat1.grid(row=4, column=2, padx=1, pady=5, sticky=tk.W)
+
+        labelminrepeat1 = tk.Label(left_frame, text="minrepeat:")
+        labelminrepeat1.grid(row=4, column=3, padx=1, pady=5, sticky=tk.W)
+        entryminrepeat1 = tk.Entry(left_frame, textvariable=tk.StringVar(value="10"), width=5)
+        entryminrepeat1.grid(row=4, column=4, padx=1, pady=5, sticky=tk.W)
+
+        def call_palindrome(input_file, output_file, minpallen=10, maxpallen=100, gaplimit=100, nummismatches=0,overlap='Y'):
+            if input_file == '':
+                return
+            commandline = ["palindrome", "-sequence", input_file, "-outfile", output_file,
+                       "-minpallen", str(minpallen), "-maxpallen", str(maxpallen), "-gaplimit", str(gaplimit),\
+                           "-nummismatches", str(nummismatches), "-overlap"]
+            print(commandline)
+            try:
+                # subprocess.check_call(commandline)
+                output = subprocess.check_output(commandline)
+                file_content_lines = []
+                with open("outfile.txt", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        file_content_lines.append(line)
+                file_content = ''.join(file_content_lines)
+                text_area.insert(tk.END, output.decode("utf-8") + "\n")
+                text_area.insert(tk.END, "outfile.txt:" + "\n")
+                text_area.insert(tk.END, file_content + "\n")
+            except subprocess.CalledProcessError as e:
+                print("Error occurred:", e)
+                tk.messagebox.showerror("Error",
+                                        f" {e}")
+        palindrome_button = tk.Button(left_frame, text="palindrome",  \
+                                      command=lambda :call_palindrome(self.check_filepath,"outfile.txt", \
+                                                                      entryminpallen.get(), entrymaxpallen.get(),entrygaplimit.get(),entrynummismatches.get()))
+        palindrome_button.grid(row=5, column=0, padx=1, pady=5, sticky=tk.W)
+
+        labelminpallen = tk.Label(left_frame, text="minpallen:" )
+        labelminpallen.grid(row=5, column=1, padx=1, pady=5, sticky=tk.W)
+        entryminpallen = tk.Entry(left_frame, textvariable=tk.StringVar(value="10"), width=5)
+        entryminpallen.grid(row=5, column=2, padx=1, pady=5, sticky=tk.W)
+
+        labelmaxpallen = tk.Label(left_frame, text="maxpallen:" )
+        labelmaxpallen.grid(row=5, column=3, padx=1, pady=5, sticky=tk.W)
+        entrymaxpallen = tk.Entry(left_frame, textvariable=tk.StringVar(value="100"), width=5)
+        entrymaxpallen.grid(row=5, column=4, padx=1, pady=5, sticky=tk.W)
+
+        labelgaplimit = tk.Label(left_frame, text="gaplimit:" )
+        labelgaplimit.grid(row=5, column=5, padx=1, pady=5, sticky=tk.W)
+        entrygaplimit = tk.Entry(left_frame, textvariable=tk.StringVar(value="100"), width=5)
+        entrygaplimit.grid(row=5, column=6, padx=1, pady=5, sticky=tk.W)
+
+        labelnummismatches = tk.Label(left_frame, text="nummismatches:" )
+        labelnummismatches.grid(row=5, column=7, padx=1, pady=5, sticky=tk.W)
+        entrynummismatches = tk.Entry(left_frame, textvariable=tk.StringVar(value="0"), width=5)
+        entrynummismatches.grid(row=5, column=8, padx=1, pady=5, sticky=tk.W)
+
+        def call_einverted(input_file, output_file, outseq, gap=12, threshold=50, match=3, mismatch=-4):
+            if input_file == '':
+                return
+            commandline = ["einverted", "-sequence", input_file, "-outfile", output_file, "-outseq", outseq,
+                       "-gap", str(gap), "-threshold", str(threshold), "-match", str(match),\
+                           "-mismatch", str(mismatch)]
+            print(commandline)
+            try:
+                # subprocess.check_call(commandline)
+                output = subprocess.check_output(commandline)
+
+                file_content_lines = []
+                with open("outfile.txt", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        file_content_lines.append(line)
+                file_content = ''.join(file_content_lines)
+                text_area.insert(tk.END, output.decode("utf-8") + "\n")
+                text_area.insert(tk.END, "outfile.txt:" + "\n")
+                text_area.insert(tk.END, file_content + "\n")
+                outseq_content_lines = []
+                with open("outseq.fasta", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        outseq_content_lines.append(line)
+                if outseq_content_lines != '':
+                    text_area.insert(tk.END, "outseq.fasta:" + "\n")
+                    text_area.insert(tk.END, file_content + "\n")
+            except subprocess.CalledProcessError as e:
+                print("Error occurred:", e)
+                tk.messagebox.showerror("Error",
+                                        f" {e}")
+
+        einverted_button = tk.Button(left_frame, text="einverted", command=lambda :call_einverted(self.check_filepath,"outfile.txt", "outseq.fasta",\
+                                                                                                  entrygap.get(), entrythreshold2.get(),entrymatch.get(),entrymismatch.get()))
+        einverted_button.grid(row=6, column=0, padx=1, pady=5, sticky=tk.W)
+
+        labelgap = tk.Label(left_frame, text="gap:")
+        labelgap.grid(row=6, column=1, padx=1, pady=5, sticky=tk.W)
+        entrygap = tk.Entry(left_frame, textvariable=tk.StringVar(value="12"), width=5)
+        entrygap.grid(row=6, column=2, padx=1, pady=5, sticky=tk.W)
+
+        labelthreshold2 = tk.Label(left_frame, text="threshold:")
+        labelthreshold2.grid(row=6, column=3, padx=1, pady=5, sticky=tk.W)
+        entrythreshold2 = tk.Entry(left_frame, textvariable=tk.StringVar(value="50"), width=5)
+        entrythreshold2.grid(row=6, column=4, padx=1, pady=5, sticky=tk.W)
+
+        labelmatch = tk.Label(left_frame, text="match:")
+        labelmatch.grid(row=6, column=5, padx=1, pady=5, sticky=tk.W)
+        entrymatch = tk.Entry(left_frame, textvariable=tk.StringVar(value="3"), width=5)
+        entrymatch.grid(row=6, column=6, padx=1, pady=5, sticky=tk.W)
+
+        labelmismatch = tk.Label(left_frame, text="mismatch:")
+        labelmismatch.grid(row=6, column=7, padx=1, pady=5, sticky=tk.W)
+        entrymismatch = tk.Entry(left_frame, textvariable=tk.StringVar(value="-4"), width=5)
+        entrymismatch.grid(row=6, column=8, padx=1, pady=5, sticky=tk.W)
+
+        def call_restrict(input_file, output_file, sitelen=4, enzymes="all"):
+            if input_file == '':
+                return
+            commandline = ["restrict", "-sequence", input_file, "-outfile", output_file,
+                       "-sitelen", str(sitelen), "-enzymes", str(enzymes)]
+            print(commandline)
+            try:
+                # subprocess.check_call(commandline)
+                output = subprocess.check_output(commandline)
+                file_content_lines = []
+                with open("outfile.txt", 'r', encoding='utf-8') as file:
+                    for line in file:
+                        file_content_lines.append(line)
+                file_content = ''.join(file_content_lines)
+                text_area.insert(tk.END, output.decode("utf-8") + "\n")
+                text_area.insert(tk.END, "outfile.txt:" + "\n")
+                text_area.insert(tk.END, file_content + "\n")
+            except subprocess.CalledProcessError as e:
+                print("Error occurred:", e)
+                tk.messagebox.showerror("Error",
+                                        f" {e}")
+
+        restrict_button = tk.Button(left_frame, text="restrict", command=lambda :call_restrict(self.check_filepath,"outfile.txt", \
+                                                                      entrysitelen.get(), entryenzymes.get()))
+        restrict_button.grid(row=7, column=0, padx=1, pady=5, sticky=tk.W)
+
+        labelsitelen = tk.Label(left_frame, text="sitelen:")
+        labelsitelen.grid(row=7, column=1, padx=1, pady=5, sticky=tk.W)
+        entrysitelen = tk.Entry(left_frame, textvariable=tk.StringVar(value="4"), width=5)
+        entrysitelen.grid(row=7, column=2, padx=1, pady=5, sticky=tk.W)
+
+        labelenzymes = tk.Label(left_frame, text="enzymes:")
+        labelenzymes.grid(row=7, column=3, padx=1, pady=5, sticky=tk.W)
+        entryenzymes = tk.Entry(left_frame, textvariable=tk.StringVar(value="BamHI,HindIII"), width=15)
+        entryenzymes.grid(row=7, column=4, columnspan=2, padx=1, pady=5, sticky=tk.W)
+
+        labelenzymes1 = tk.Label(left_frame, text="('all' for all REBASE enzymes)")
+        labelenzymes1.grid(row=7, column=6, columnspan=3, padx=1, pady=5, sticky=tk.W)
+
+        # Right side (ScrolledText)
+        right_frame = tk.Frame(frame)
+        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        # right_frame.grid(row=0, column=1, sticky="nesw", padx=5, pady=5)
+        text_area = scrolledtext.ScrolledText(right_frame, wrap=tk.WORD, font=("Courier New", 10))
+        text_area.pack(fill=tk.BOTH, expand=True)
+        # text_area.grid(row=0, column=0, sticky="nesw", padx=5, pady=5)
+        # right_frame.grid_rowconfigure(0, weight=1)
+        # right_frame.grid_columnconfigure(0, weight=1)
+        # frame.grid_rowconfigure(0, weight=1)
+        # frame.grid_columnconfigure(1, weight=1)
+
+
     def customize_organism(self):
         """
         function to customize organism.
@@ -1006,13 +1300,13 @@ class App(tk.Tk):
         def validate_codon_input(entry, row, col, is_amino_acid=True):
             value = entry.get()
             if value:
-                if col == 1 or col == 4:  # 频率列
+                if col == 1 or col == 4:
                     if not value.isalpha() and value != '*':
                         # self.withdraw()
                         tk.messagebox.showerror("Error", f"Invalid input in row {row + 1}, column {col + 1}. amino_acid should be a letter or *.")
                         # self.mainloop()
                         return False
-                elif col == 2 or col == 5:  # 比例列
+                elif col == 2 or col == 5:
                     #if not re.match(r'^0\.\d+$', value):
                     if not re.match(r'^(0\.\d{2}|1\.00)$', value):
                         tk.messagebox.showerror("Error", f"Invalid input in row {row + 1}, column {col + 1}. fraction should be a decimal in the form 0.xx or 1.00")

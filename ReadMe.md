@@ -1,3 +1,5 @@
+
+
 ### Visual codon: A user-friendly Python program for viewing and optimizing gene GC content
 
 This program is used to display, modify, and compare the codons of gene. It shows the codons and GC content of the gene in the form of visual graphics, and the user can modify the codons to optimize GC content.
@@ -8,6 +10,11 @@ The program has built-in support for 16 species including Escherichia coil, Yeas
 
 The program also supports custom host species. Users can configure the codon table of the host species  through the program interface, or manually edit the txt file to achieve it.
 This program can be run on macOS/Linux/Windows and the results are the same. Please follow the instructions below to install and run the program.
+
+The check sequence function of this program calls the EMBOSS software (https://emboss.sourceforge.net/). If you need to use the check sequence function, please make sure that the EMBOSS software is installed in advance. The EMBOSS version used by the author is 6.6.0.0. Please refer to https://emboss.sourceforge.net/apps/ for installation instructions.
+
+
+
 
 ### I. Installation
 #### <font color=red> in macOS/Linux </font>
@@ -161,7 +168,7 @@ This program supports X11 forwarding to connect to remote Linux servers. Here we
 
 (2) Use SecureCRT to log in to the remote Linux server with SSH2.
 
-(3) After logging in to the Linux server, set the environment variable DISPLAY. THe 192.168.31.129 is the IP address of the Windows computer of the author, please replace it with the IP address of your own computer.
+(3) After logging in to the Linux server, set the environment variable DISPLAY. The 192.168.31.129 is the IP address of the Windows computer of the author, please replace it with the IP address of your own computer.
 
 ```zsh
 % export DISPLAY=192.168.31.129:0.0
@@ -245,6 +252,11 @@ After the modification is completed, open the visual codon program, click Open F
 
 Note: When modifying the example_of_customized_codon_table.txt, you must ensure that the amino acids, codons, and fractions filled in are correct.
 
-(11) Click File->'Reinitialize' to reset the gene file, after which the new gene file can be opened, and the host species has not been changed.
+(11) Click Edit->'Check sequence' to verify the DNA sequence.
+The Check sequence interface provides five EMBOSS commands: equicktandem, etandem, palindrome, einverted, and restrict.(https://emboss.sourceforge.net/).
+
+PLEASE MAKE SURE THAT EMBOSS IS INSTALLED CORRECTLY BEFORE USING THIS FEATURE.
+
+(12) Click File->'Reinitialize' to reset the gene file, after which the new gene file can be opened, and the host species has not been changed.
 
 If you need to change the host species, please close the program and select the desired host species on the host species selection screen when you reopen the program.
